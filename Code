@@ -1,0 +1,156 @@
+package com.company;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+/**
+ *    Will create a playlist in alphabetical order from the top songs of the past 5 weeks
+ *    @author Anthony Ramanovich
+ *    @version 1.0 , 10/23/20
+ */
+public class Lab4 {
+    public static void main(String[] args) throws FileNotFoundException {
+        String[][] spotify = new String[1000][5];
+        File week1 = new File("C:\\regional-global-weekly-latest.csv");
+        File week2 = new File("C:\\regional-global-weekly-2020-10-09--2020-10-16.csv");
+        File week3 = new File("C:\\regional-global-weekly-2020-10-02--2020-10-09.csv");
+        File week4 = new File("C:\\regional-global-weekly-2020-09-25--2020-10-02.csv");
+        File week5 = new File("C:\\regional-global-weekly-2020-09-18--2020-09-25.csv");
+        scan(week1, 0, spotify);
+        scan(week2, 200, spotify);
+        scan(week3, 400, spotify);
+        scan(week4, 600, spotify);
+        scan(week5, 800, spotify);
+        String[] songNames = new String[1000];
+        String[] artistNames = new String[1000];
+        int unique = -1;
+        for(int i = 0; i < 1000; i++){
+            int check = contains(songNames, spotify[i][1]);
+            if(-1 == check){
+                unique++;
+                songNames[unique] = spotify[i][1];
+                artistNames[unique] = spotify[i][2];
+            }
+        }
+        String[][] chart = new String[unique][2];
+        for(int i = 0; i < unique; i++){
+            chart[i][0] = songNames[i];
+            chart[i][1] = artistNames[i];
+        }
+        for(int i = 0; i < chart.length; i++){
+            if (chart[i][0].charAt(0) == '"') {
+                chart[i][0] = chart[i][0].substring(1, chart[i][0].length() - 1);
+            }
+            if (chart[i][1].charAt(0) == '"') {
+                chart[i][1] = chart[i][1].substring(1, chart[i][1].length() - 1);
+            }
+        }
+        sort(chart);
+       // can be used for test purposes
+       // Playlist playlist = new Playlist(chart.length);
+       // for(int i = 0; i < chart.length; i++){
+       //     playlist.addSong(chart[i][0], chart[i][1]);
+       // }
+       // for(int i = 0; i < chart.length; i++) {
+       //     playlist.nextSong();
+       // }
+       // playlist.getPlayedSongs();
+    }
+    /**
+     * Scans the 5 weeks of music into a single array
+     * @param file the specific week getting scanned
+     * @param position where the array is up to
+     * @param spotify the array getting filled
+     * @throws FileNotFoundException
+     */
+    public static void scan(File file, int position, String[][]spotify) throws FileNotFoundException {
+        Scanner in;
+        in = new Scanner(file);
+        in.nextLine();
+        in.nextLine();
+        for(int i = 0; i < 200; i++) {
+            String line = in.nextLine();
+            String[] values = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            for (int j = 0; j < 5; j++) {
+                spotify[i + position][j] = values[j];
+            }
+        }
+    }
+    /**
+     * Checks if a certain song is already in the array
+     * @param array the array of songs
+     * @param name the name that is being checked for
+     * @return where the song appears in the array or -1 if they do not appear
+     */
+    public static int contains(String[] array, String name){
+        for(int i = 0; i < 1000; i++){
+            if (array[i] == null){
+                break;
+            }
+            if (0 == array[i].compareTo(name)){
+                return i;
+            }
+        }
+        return -1;
+    }
+    /**
+     * Sorts the array
+     * @param chart the array of songs and artists
+     */
+    public static void sort(String[][] chart){
+        String temp;
+        for (int i = 0; i < chart.length; i++)
+        {
+            for (int j = i + 1; j < chart.length; j++) {
+                if (chart[i][0].compareToIgnoreCase(chart[j][0]) > 0)
+                {
+                    temp = chart[i][0];
+                    chart[i][0] = chart[j][0];
+                    chart[j][0] = temp;
+                    temp = chart[i][1];
+                    chart[i][1] = chart[j][1];
+                    chart[j][1] = temp;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * A Deque class
+ */
+class Playlist {
+    private int maxSize;
+    private String[][] queArray;
+    private String[][] playedSongs;
+    private int left;
+    private int right;
+    public Playlist(int s){
+        maxSize = s;
+        queArray = new String[maxSize][2];
+        playedSongs = new String[maxSize][2];
+        right = -1;
+        left = 0;
+    }
+    public void addSong(String song, String artist){
+        queArray[++right][0] = song;
+        queArray[right][1] = artist;
+    }
+    public void nextSong(){
+        playedSongs[left][0] = queArray[left][0];
+        playedSongs[left][1] = queArray[left][1];
+        String tempSong = queArray[left][0];
+        String tempArtist = queArray[left++][1];
+        System.out.println("Now playing: " + tempSong + " By " + tempArtist);
+        return;
+    }
+    public String[][] getPlayedSongs(){
+        for(int i = 0; i < playedSongs.length; i++){
+            System.out.println(playedSongs[i][0] + " By " + playedSongs[i][1]);
+        }
+        return playedSongs;
+    }
+    public void lastSongPlayed(){
+        System.out.println(playedSongs[left][0] + " By " + playedSongs[left][1]);
+    }
+}
