@@ -1,1 +1,2 @@
 # Lab-4
+The code will read data from 5 spotify csv files and create a playlist from the songs in alphabetical order. Using the split method it converts the csv files to a 2d array. From there a new 2d array is created that contains only unique songs and their respective artists, which is then sorted. A class is included to turn the list into a playlist if needed that can return teh next song on teh playlist and track which songs have already been played.
